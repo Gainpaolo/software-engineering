@@ -1,0 +1,2 @@
+numpy==1.21.2
+Pinyin2Hanzi==0.1.1
