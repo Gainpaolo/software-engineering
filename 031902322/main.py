@@ -3,26 +3,26 @@
 然后遍历新词的每个字是否出现在敏感词链表中,如果出现,即为敏感词,"""
 import time
 import re
-
-import os
 import sys
-from c_and_arrangement import word_word
-from Pinyin2Hanzi import DefaultDagParams
-from Pinyin2Hanzi import dag
+from c_and_arrangement import WORDword
+
+
 # DFA算法
-time1=time.time()
-class DFAFilter():
+
+class DFAFilter:
+
     def __init__(self):
         self.keyword_chains = {}
         self.delimit = '\x00'
 
-    def add(self, keyword,ww):
-        keyword = keyword.lower()# 关键词英文变为小写
-        chars = keyword.strip()# 关键字去除首尾空格和换行
-        if not chars:# 如果关键词为空直接返回
+    def add(self, keyword, ww):
+        keyword = keyword.lower()  # 关键词英文变为小写
+        chars = keyword.strip()  # 关键字去除首尾空格和换行
+        if not chars:  # 如果关键词为空直接返回
             return
         level = self.keyword_chains
         # 遍历关键字的每个字
+        i = 0
         for i in range(len(chars)):
             if chars[i] in level:
                 # 如果这个字已经存在字符链的key中就进入其子字典
@@ -30,103 +30,98 @@ class DFAFilter():
             else:
                 if not isinstance(level, dict):
                     break
+                last_level = {}
+                last_char = ""
                 for j in range(i, len(chars)):
                     level[chars[j]] = {}
                     last_level, last_char = level, chars[j]
                     level = level[chars[j]]
-                last_level[last_char] = {self.delimit: ww}
+                last_level[last_char] = {self.delimit: ww}  # 对同一类别的敏感词进行标记
                 break
-        if i == len(chars) - 1:# 最后一个字
-            level[self.delimit] = ww
+        if i == len(chars) - 1:  # 最后一个字
+            level[self.delimit] = ww  # 对同一类别的敏感词进行标记
 
-
-    def parse(self, path):#创建敏感词树
-        k = word_word()
-        tt=1
-        with open(path,encoding='utf-8') as f:
+    def parse(self, path):  # 创建敏感词树
+        k = WORDword()
+        tt = 1
+        with open(path, encoding='utf-8') as f:
             for keyword in f:
 
-                keyword=keyword.strip()
-                all_kind = []
+                keyword = keyword.strip()
                 all_kind = k.changeandarra(keyword)
                 for i in all_kind:
-                    self.add(str(i).strip(),tt)
-                tt=tt+1
+                    self.add(str(i).strip(), tt)
+                tt = tt + 1
 
-    def filter(self, path1,path2 ,path3,repl="*"):
-        messages=open(path1, encoding="utf-8")
-        i=1
-        total =0
+    def filter(self, path1, path2, path3):
+        messages = open(path1, encoding="utf-8")
+        i = 1
+        total = 0
         allword = []
-        rang=[]
-        old_word=[]
-        baocun_oldword=[]
-        string = "~!@#！…￥$%^&*( )·|_+-*/<>,—.[]\ =?';\"{}，。《》？\\:：“/1234\'56789【】；‘、；"
+        rang = []
+        old_word = []
+        baocun_oldword = []
+        string = "~!@#！…￥$%^&*( )·|_+-*/<>,—.[]=?;\"{}，。《》？\\:：“/1234\'56789【】；‘、；"
         with open(path3, encoding="utf-8") as pps:
             for pp in pps:
-                pp=pp.strip()
+                pp = pp.strip()
                 old_word.append(pp)
         for message in messages:
             message = message.lower()
-            ret = []
             start = 0
-
-            find_1=''
+            find_1 = ''
             while start < len(message):
                 level = self.keyword_chains
                 step_ins = 0
                 for char in message[start:]:
-                    if (re.search(r"\W",char) or char in string) and    step_ins!=0 :
+                    if (re.search(r"\W", char) or char in string) and step_ins != 0:
                         find_1 = find_1 + char
-                        step_ins+=1
+                        step_ins += 1
                         continue
                     if char in level:
                         step_ins += 1
-                        find_1=find_1+char
+                        find_1 = find_1 + char
                         if self.delimit not in level[char]:
                             level = level[char]
                         else:
-                            number = re.findall("\d+",str(level[char].values()))
-                            ret.append(repl * step_ins)
-                            baocun_oldword.append(old_word[int(number[0])-1])
-                            print(old_word[int(number[0])-1])
+                            number = re.findall("\\d+", str(level[char].values()))  # 这里用正则找到之前标记的敏感词种类
+                            baocun_oldword.append(old_word[int(number[0]) - 1])
+                            print(old_word[int(number[0]) - 1])
                             allword.append(find_1)
                             rang.append(i)
-                            find_1=''
+                            find_1 = ''
                             start += step_ins - 1
-                            total+=1
+                            total += 1
                             break
                     else:
-                        ret.append(message[start])
                         find_1 = ''
                         break
-                else:
-                    ret.append(message[start])
                 start += 1
-            i=i+1
-        f=open(path2, 'a',encoding='utf-8')
+            i = i + 1
+        f = open(path2, 'a', encoding='utf-8')
         f.write('Total:{}\n'.format(total))
         for i in range(len(allword)):
-            f.write('line{}'.format(rang[i]) + ':<'+baocun_oldword[i]+'>' + allword[i]+'\n')
+            f.write('line{}'.format(rang[i]) + ':<' + baocun_oldword[i] + '>' + allword[i] + '\n')
 
 
 def main(argv):
-    path1=argv[1]
-    path2=argv[2]
-    path3=argv[3]
+    path1 = argv[1]
+    path2 = argv[2]
+    path3 = argv[3]
     gfw = DFAFilter()
 
-    #path1 = "E:/hh/words.txt"
-    #path2 = 'E:/hh/org.txt'
-    #path3 = 'E:/hh/tst.txt'
+    # path1 = "E:/hh/words.txt"
+    # path2 = 'E:/hh/org.txt'
+    # path3 = 'E:/hh/tst.txt'
     gfw.parse(path1)
     gfw.filter(path2, path3, path1)
     time2 = time.time()
     print('总共耗时：' + str(time2 - time1) + 's')
+
+
 if __name__ == "__main__":
-    if len(sys.argv)!=4:
+    time1 = time.time()
+    if len(sys.argv) != 4:
         print('usage: python  getuser.py inputfile1 inputfile2 outfile')
     else:
         main(sys.argv)
-
-
