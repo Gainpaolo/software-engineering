@@ -8,7 +8,7 @@ from Pinyin2Hanzi import DefaultDagParams
 from Pinyin2Hanzi import dag
 pinyin = Pinyin()
 translate = Translate()
-read_dictionary = np.load('my_words.npy', allow_pickle=True).item()
+read_dictionary = np.load('../031902322/my_words.npy', allow_pickle=True).item()
 
 
 class WORDword:
@@ -22,7 +22,7 @@ class WORDword:
                 d = [pinyin.GetPinyin(i).lower()]
                 dagparams = DefaultDagParams()
                 # 10个候选值
-                result = dag(dagparams, d, path_num=15, log=True)
+                result = dag(dagparams, d, path_num=5, log=True)
                 for item in result:
                     res = item.path  # 转换结果
                     if res[0] not in one_word:
