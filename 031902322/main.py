@@ -60,7 +60,6 @@ class DFAFilter:
         old_word = []
         baocun_oldword = []
         mark = 0
-        number = 0
         temp = {}
         string = "~!@#！…￥$%^&*( )·|_+-*/<>,—.[]=?;\"{}，。《》？\\:：“/1234\'56789【】；‘、；"
         with open(path3, encoding="utf-8") as pps:
@@ -87,7 +86,7 @@ class DFAFilter:
                         else:
                             number = re.findall("\\d+", str(level[char1].values()))
                             if len(level[char1]) == 1 and mark == 0:
-                                #number = re.findall("\\d+", str(level[char1].values()))  # 这里用正则找到之前标记的敏感词种类
+                                # number = re.findall("\\d+", str(level[char1].values()))  # 这里用正则找到之前标记的敏感词种类
                                 baocun_oldword.append(old_word[int(number[0]) - 1])
                                 allword.append(find_1)
                                 rang.append(i)
@@ -120,12 +119,11 @@ class DFAFilter:
             f.write('Line{}'.format(rang[i]) + ': <' + baocun_oldword[i] + '> ' + allword[i] + '\n')
 
 
-"""def main(argv):
+def main(argv):
     path1 = argv[1]
     path2 = argv[2]
     path3 = argv[3]
     gfw = DFAFilter()
-
     # path1 = "E:/hh/words.txt"
     # path2 = 'E:/hh/org.txt'
     # path3 = 'E:/hh/tst.txt'
@@ -134,18 +132,11 @@ class DFAFilter:
     time2 = time.time()
     print('总共耗时：' + str(time2 - time1) + 's')
 
-"""
+
 if __name__ == "__main__":
     time1 = time.time()
-    """if len(sys.argv) != 4:
+    if len(sys.argv) != 4:
         print('usage: python  getuser.py inputfile1 inputfile2 outfile')
     else:
-        main(sys.argv)"""
-    path11 = "E:/hh/2.txt "
-    path22 =  "E:/hh/1.txt "
-    path33 =  "E:/hh/3.txt"
-    gfw = DFAFilter()
-    gfw.parse(path11)
-    gfw.filter(path22, path33, path11)
-    time2 = time.time()
-    print('总共耗时：' + str(time2 - time1) + 's')
+        main(sys.argv)
+

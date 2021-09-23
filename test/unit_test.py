@@ -1,6 +1,5 @@
 from main import DFAFilter
 
-
 def test_W():
     org_txt = "E:/hh/1.txt "
     word_txt = "E:/hh/2.txt "
