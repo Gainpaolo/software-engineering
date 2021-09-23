@@ -28,7 +28,7 @@ class WORDword:
                     res = item.path  # 转换结果
                     if res[0] not in one_word:
                         one_word.append(res[0])
-                one_word.append(pinyin.GetPinyin(i)[0])
+                one_word.append(pinyin.GetPinyin(i).lower()[0])
                 one_word.append(translate.ToTraditionalChinese(i))
                 if i in read_dictionary:
                     one_word.append(read_dictionary[i])
